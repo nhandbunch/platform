@@ -60,7 +60,7 @@
         "MaxIdleConns": 10,
         "MaxOpenConns": 10,
         "Trace": false,
-        "AtRestEncryptKey": ""
+        "AtRestEncryptKey": "6ngsec5wg98udwxtxno6s518up6s6cra"
     },
     "LogSettings": {
         "EnableConsole": false,
@@ -84,7 +84,7 @@
         "DriverName": "local",
         "Directory": "./data/",
         "EnablePublicLink": false,
-        "PublicLinkSalt": "",
+        "PublicLinkSalt": "c3owgiohojq4j8qr3yofun4djxwdtbg6",
         "ThumbnailWidth": 120,
         "ThumbnailHeight": 100,
         "PreviewWidth": 1024,
@@ -115,8 +115,8 @@
         "SMTPServer": "",
         "SMTPPort": "",
         "ConnectionSecurity": "",
-        "InviteSalt": "",
-        "PasswordResetSalt": "",
+        "InviteSalt": "i7k6wfznjknj6ppcs167ybcycg9wm5mq",
+        "PasswordResetSalt": "t3puhea9wcs6krpkdb5suj4udsqoi9es",
         "SendPushNotifications": false,
         "PushNotificationServer": "",
         "PushNotificationContents": "generic",
@@ -125,8 +125,9 @@
         "EmailBatchingInterval": 30
     },
     "RateLimitSettings": {
-        "EnableRateLimiter": true,
+        "Enable": false,
         "PerSec": 10,
+        "MaxBurst": 100,
         "MemoryStoreSize": 10000,
         "VaryByRemoteAddr": true,
         "VaryByHeader": ""
@@ -144,22 +145,23 @@
         "SupportEmail": "feedback@mattermost.com"
     },
     "GitLabSettings": {
-        "Enable": false,
-        "Secret": "",
-        "Id": "",
+        "Enable": true,
+        "Secret": "177ecd4a5ce85d65f5434789d5b99edceb904be93e4aa8b74a2397ee2396fec5",
+        "Id": "e2857018cf69d1b14bcf3e0e92db6e0bed41d23ae453ca772fd72a35dc7d6d16",
         "Scope": "",
-        "AuthEndpoint": "",
-        "TokenEndpoint": "",
-        "UserApiEndpoint": ""
+        "AuthEndpoint": "http://gitlab.rever.vn/oauth/authorize",
+        "TokenEndpoint": "http://gitlab.rever.vn/oauth/token",
+        "UserApiEndpoint": "http://gitlab.rever.vn/api/v3/user"
     },
     "GoogleSettings": {
-        "Enable": false,
-        "Secret": "",
-        "Id": "",
-        "Scope": "profile email",
+        "Enable": true,
+        "Secret": "5axpO0CIQlUpQZbt2-6nA3X_",
+        "Id": "307733077824-ar5oa2r2pklicahed8veljd3qmsje98e.apps.googleusercontent.com",
+        "ResponseType": "code",
+        "Scope": "profile email openid",
         "AuthEndpoint": "https://accounts.google.com/o/oauth2/v2/auth",
         "TokenEndpoint": "https://www.googleapis.com/oauth2/v4/token",
-        "UserApiEndpoint": "https://www.googleapis.com/plus/v1/people/me"
+        "UserApiEndpoint": "https://www.googleapis.com/oauth2/v3/tokeninfo"
     },
     "Office365Settings": {
         "Enable": false,

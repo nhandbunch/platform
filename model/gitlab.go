@@ -5,4 +5,5 @@ package model
 
 const (
 	USER_AUTH_SERVICE_GITLAB = "gitlab"
+	USER_AUTH_SERVICE_GOOGLE = "google"
 )

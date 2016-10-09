@@ -30,6 +30,7 @@ import (
 
 	// Plugins
 	_ "github.com/mattermost/platform/model/gitlab"
+	_ "github.com/mattermost/platform/model/google"
 
 	// Enterprise Deps
 	_ "github.com/dgryski/dgoogauth"

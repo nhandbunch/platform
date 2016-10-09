@@ -10,46 +10,46 @@ import (
 )
 
 const (
-	CONN_SECURITY_NONE     = ""
-	CONN_SECURITY_PLAIN    = "PLAIN"
-	CONN_SECURITY_TLS      = "TLS"
+	CONN_SECURITY_NONE = ""
+	CONN_SECURITY_PLAIN = "PLAIN"
+	CONN_SECURITY_TLS = "TLS"
 	CONN_SECURITY_STARTTLS = "STARTTLS"
 
 	IMAGE_DRIVER_LOCAL = "local"
-	IMAGE_DRIVER_S3    = "amazons3"
+	IMAGE_DRIVER_S3 = "amazons3"
 
-	DATABASE_DRIVER_MYSQL    = "mysql"
+	DATABASE_DRIVER_MYSQL = "mysql"
 	DATABASE_DRIVER_POSTGRES = "postgres"
 
 	PASSWORD_MAXIMUM_LENGTH = 64
 	PASSWORD_MINIMUM_LENGTH = 5
 
-	SERVICE_GITLAB    = "gitlab"
-	SERVICE_GOOGLE    = "google"
+	SERVICE_GITLAB = "gitlab"
+	SERVICE_GOOGLE = "google"
 	SERVICE_OFFICE365 = "office365"
 
-	WEBSERVER_MODE_REGULAR  = "regular"
-	WEBSERVER_MODE_GZIP     = "gzip"
+	WEBSERVER_MODE_REGULAR = "regular"
+	WEBSERVER_MODE_GZIP = "gzip"
 	WEBSERVER_MODE_DISABLED = "disabled"
 
 	GENERIC_NOTIFICATION = "generic"
-	FULL_NOTIFICATION    = "full"
+	FULL_NOTIFICATION = "full"
 
-	DIRECT_MESSAGE_ANY  = "any"
+	DIRECT_MESSAGE_ANY = "any"
 	DIRECT_MESSAGE_TEAM = "team"
 
-	PERMISSIONS_ALL          = "all"
-	PERMISSIONS_TEAM_ADMIN   = "team_admin"
+	PERMISSIONS_ALL = "all"
+	PERMISSIONS_TEAM_ADMIN = "team_admin"
 	PERMISSIONS_SYSTEM_ADMIN = "system_admin"
 
 	FAKE_SETTING = "********************************"
 
-	RESTRICT_EMOJI_CREATION_ALL          = "all"
-	RESTRICT_EMOJI_CREATION_ADMIN        = "admin"
+	RESTRICT_EMOJI_CREATION_ALL = "all"
+	RESTRICT_EMOJI_CREATION_ADMIN = "admin"
 	RESTRICT_EMOJI_CREATION_SYSTEM_ADMIN = "system_admin"
 
 	EMAIL_BATCHING_BUFFER_SIZE = 256
-	EMAIL_BATCHING_INTERVAL    = 30
+	EMAIL_BATCHING_INTERVAL = 30
 
 	SITENAME_MAX_LENGTH = 30
 )
@@ -103,6 +103,7 @@ type SSOSettings struct {
 	Secret          string
 	Id              string
 	Scope           string
+	ResponseType    string
 	AuthEndpoint    string
 	TokenEndpoint   string
 	UserApiEndpoint string
@@ -227,27 +228,27 @@ type TeamSettings struct {
 
 type LdapSettings struct {
 	// Basic
-	Enable             *bool
-	LdapServer         *string
-	LdapPort           *int
-	ConnectionSecurity *string
-	BaseDN             *string
-	BindUsername       *string
-	BindPassword       *string
+	Enable                      *bool
+	LdapServer                  *string
+	LdapPort                    *int
+	ConnectionSecurity          *string
+	BaseDN                      *string
+	BindUsername                *string
+	BindPassword                *string
 
 	// Filtering
-	UserFilter *string
+	UserFilter                  *string
 
 	// User Mapping
-	FirstNameAttribute *string
-	LastNameAttribute  *string
-	EmailAttribute     *string
-	UsernameAttribute  *string
-	NicknameAttribute  *string
-	IdAttribute        *string
+	FirstNameAttribute          *string
+	LastNameAttribute           *string
+	EmailAttribute              *string
+	UsernameAttribute           *string
+	NicknameAttribute           *string
+	IdAttribute                 *string
 
 	// Syncronization
-	SyncIntervalMinutes *int
+	SyncIntervalMinutes         *int
 
 	// Advanced
 	SkipCertificateVerification *bool
@@ -255,7 +256,7 @@ type LdapSettings struct {
 	MaxPageSize                 *int
 
 	// Customization
-	LoginFieldName *string
+	LoginFieldName              *string
 }
 
 type ComplianceSettings struct {
@@ -272,27 +273,27 @@ type LocalizationSettings struct {
 
 type SamlSettings struct {
 	// Basic
-	Enable  *bool
-	Verify  *bool
-	Encrypt *bool
+	Enable                      *bool
+	Verify                      *bool
+	Encrypt                     *bool
 
 	IdpUrl                      *string
 	IdpDescriptorUrl            *string
 	AssertionConsumerServiceURL *string
 
-	IdpCertificateFile    *string
-	PublicCertificateFile *string
-	PrivateKeyFile        *string
+	IdpCertificateFile          *string
+	PublicCertificateFile       *string
+	PrivateKeyFile              *string
 
 	// User Mapping
-	FirstNameAttribute *string
-	LastNameAttribute  *string
-	EmailAttribute     *string
-	UsernameAttribute  *string
-	NicknameAttribute  *string
-	LocaleAttribute    *string
+	FirstNameAttribute          *string
+	LastNameAttribute           *string
+	EmailAttribute              *string
+	UsernameAttribute           *string
+	NicknameAttribute           *string
+	LocaleAttribute             *string
 
-	LoginButtonText *string
+	LoginButtonText             *string
 }
 
 type NativeAppSettings struct {
@@ -347,14 +348,20 @@ func (o *Config) ToJson() string {
 func (o *Config) GetSSOService(service string) *SSOSettings {
 	switch service {
 	case SERVICE_GITLAB:
-		return &o.GitLabSettings
+		return SetDefaultSSPSettings(&o.GitLabSettings)
 	case SERVICE_GOOGLE:
-		return &o.GoogleSettings
+		return SetDefaultSSPSettings(&o.GoogleSettings)
 	case SERVICE_OFFICE365:
-		return &o.Office365Settings
+		return SetDefaultSSPSettings(&o.Office365Settings)
 	}
-
 	return nil
+}
+
+func SetDefaultSSPSettings(ssoSettings *SSOSettings) *SSOSettings {
+	if len(ssoSettings.ResponseType) == 0 {
+		ssoSettings.ResponseType = "code"
+	}
+	return ssoSettings
 }
 
 func ConfigFromJson(data io.Reader) *Config {

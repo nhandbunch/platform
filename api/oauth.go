@@ -286,7 +286,7 @@ func completeOAuth(c *Context, w http.ResponseWriter, r *http.Request) {
 
 	code := r.URL.Query().Get("code")
 	if len(code) == 0 {
-		c.Err = model.NewLocAppError("completeOAuth", "api.oauth.complete_oauth.missing_code.app_error", map[string]interface{}{"service": strings.Title(service)}, "URL: "+r.URL.String())
+		c.Err = model.NewLocAppError("completeOAuth", "api.oauth.complete_oauth.missing_code.app_error", map[string]interface{}{"service": strings.Title(service)}, "URL: " + r.URL.String())
 		return
 	}
 
@@ -308,7 +308,7 @@ func completeOAuth(c *Context, w http.ResponseWriter, r *http.Request) {
 		case model.OAUTH_ACTION_SIGNUP:
 			CreateOAuthUser(c, w, r, service, body, teamId)
 			if c.Err == nil {
-				http.Redirect(w, r, GetProtocol(r)+"://"+r.Host, http.StatusTemporaryRedirect)
+				http.Redirect(w, r, GetProtocol(r) + "://" + r.Host, http.StatusTemporaryRedirect)
 			}
 			break
 		case model.OAUTH_ACTION_LOGIN:
@@ -318,28 +318,28 @@ func completeOAuth(c *Context, w http.ResponseWriter, r *http.Request) {
 			}
 			if c.Err == nil {
 				if val, ok := props["redirect_to"]; ok {
-					http.Redirect(w, r, c.GetSiteURL()+val, http.StatusTemporaryRedirect)
+					http.Redirect(w, r, c.GetSiteURL() + val, http.StatusTemporaryRedirect)
 					return
 				}
-				http.Redirect(w, r, GetProtocol(r)+"://"+r.Host, http.StatusTemporaryRedirect)
+				http.Redirect(w, r, GetProtocol(r) + "://" + r.Host, http.StatusTemporaryRedirect)
 			}
 			break
 		case model.OAUTH_ACTION_EMAIL_TO_SSO:
 			CompleteSwitchWithOAuth(c, w, r, service, body, props["email"])
 			if c.Err == nil {
-				http.Redirect(w, r, GetProtocol(r)+"://"+r.Host+"/login?extra=signin_change", http.StatusTemporaryRedirect)
+				http.Redirect(w, r, GetProtocol(r) + "://" + r.Host + "/login?extra=signin_change", http.StatusTemporaryRedirect)
 			}
 			break
 		case model.OAUTH_ACTION_SSO_TO_EMAIL:
 			LoginByOAuth(c, w, r, service, body)
 			if c.Err == nil {
-				http.Redirect(w, r, GetProtocol(r)+"://"+r.Host+"/claim?email="+url.QueryEscape(props["email"]), http.StatusTemporaryRedirect)
+				http.Redirect(w, r, GetProtocol(r) + "://" + r.Host + "/claim?email=" + url.QueryEscape(props["email"]), http.StatusTemporaryRedirect)
 			}
 			break
 		default:
 			LoginByOAuth(c, w, r, service, body)
 			if c.Err == nil {
-				http.Redirect(w, r, GetProtocol(r)+"://"+r.Host, http.StatusTemporaryRedirect)
+				http.Redirect(w, r, GetProtocol(r) + "://" + r.Host, http.StatusTemporaryRedirect)
 			}
 			break
 		}
@@ -378,7 +378,7 @@ func authorizeOAuth(c *Context, w http.ResponseWriter, r *http.Request) {
 
 	// here we should check if the user is logged in
 	if len(c.Session.UserId) == 0 {
-		http.Redirect(w, r, c.GetSiteURL()+"/login?redirect_to="+url.QueryEscape(r.RequestURI), http.StatusFound)
+		http.Redirect(w, r, c.GetSiteURL() + "/login?redirect_to=" + url.QueryEscape(r.RequestURI), http.StatusFound)
 		return
 	}
 
@@ -402,7 +402,7 @@ func authorizeOAuth(c *Context, w http.ResponseWriter, r *http.Request) {
 			url := c.GetSiteURL() + "/api/v3/oauth/allow?response_type=" + model.AUTHCODE_RESPONSE_TYPE + "&client_id=" + clientId + "&redirect_uri=" + url.QueryEscape(redirect) + "&scope=" + scope + "&state=" + url.QueryEscape(state)
 			rq, _ := http.NewRequest("GET", url, strings.NewReader(""))
 
-			rq.Header.Set(model.HEADER_AUTH, model.HEADER_BEARER+" "+c.Session.Token)
+			rq.Header.Set(model.HEADER_AUTH, model.HEADER_BEARER + " " + c.Session.Token)
 
 			if rp, err := HttpClient.Do(rq); err != nil {
 				return nil, model.NewLocAppError(url, "model.client.connecting.app_error", nil, err.Error())
@@ -431,7 +431,7 @@ func authorizeOAuth(c *Context, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
 	w.Header().Set("Cache-Control", "no-cache, max-age=31556926, public")
-	http.ServeFile(w, r, utils.FindDir(model.CLIENT_DIR)+"root.html")
+	http.ServeFile(w, r, utils.FindDir(model.CLIENT_DIR) + "root.html")
 }
 
 func getAccessToken(c *Context, w http.ResponseWriter, r *http.Request) {
@@ -658,7 +658,8 @@ func getTeamIdFromQuery(query url.Values) (string, *model.AppError) {
 		}
 
 		t, err := strconv.ParseInt(props["time"], 10, 64)
-		if err != nil || model.GetMillis()-t > 1000*60*60*48 { // 48 hours
+		if err != nil || model.GetMillis() - t > 1000 * 60 * 60 * 48 {
+			// 48 hours
 			return "", model.NewLocAppError("getTeamIdFromQuery", "api.oauth.singup_with_oauth.expired_link.app_error", nil, "")
 		}
 
@@ -709,7 +710,7 @@ func GetAuthorizationCode(c *Context, service string, props map[string]string, l
 
 	sso := utils.Cfg.GetSSOService(service)
 	if sso != nil && !sso.Enable {
-		return "", model.NewLocAppError("GetAuthorizationCode", "api.user.get_authorization_code.unsupported.app_error", nil, "service="+service)
+		return "", model.NewLocAppError("GetAuthorizationCode", "api.user.get_authorization_code.unsupported.app_error", nil, "service=" + service)
 	}
 
 	clientId := sso.Id
@@ -737,7 +738,7 @@ func GetAuthorizationCode(c *Context, service string, props map[string]string, l
 func AuthorizeOAuthUser(service, code, state, redirectUri string) (io.ReadCloser, string, map[string]string, *model.AppError) {
 	sso := utils.Cfg.GetSSOService(service)
 	if sso == nil || !sso.Enable {
-		return nil, "", nil, model.NewLocAppError("AuthorizeOAuthUser", "api.user.authorize_oauth_user.unsupported.app_error", nil, "service="+service)
+		return nil, "", nil, model.NewLocAppError("AuthorizeOAuthUser", "api.user.authorize_oauth_user.unsupported.app_error", nil, "service=" + service)
 	}
 
 	stateStr := ""
@@ -766,6 +767,7 @@ func AuthorizeOAuthUser(service, code, state, redirectUri string) (io.ReadCloser
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: *utils.Cfg.ServiceSettings.EnableInsecureOutgoingConnections},
 	}
 	client := &http.Client{Transport: tr}
+
 	req, _ := http.NewRequest("POST", sso.TokenEndpoint, strings.NewReader(p.Encode()))
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -787,7 +789,7 @@ func AuthorizeOAuthUser(service, code, state, redirectUri string) (io.ReadCloser
 	}
 
 	if strings.ToLower(ar.TokenType) != model.ACCESS_TOKEN_TYPE {
-		return nil, "", nil, model.NewLocAppError("AuthorizeOAuthUser", "api.user.authorize_oauth_user.bad_token.app_error", nil, "token_type="+ar.TokenType+", response_body="+string(respBody))
+		return nil, "", nil, model.NewLocAppError("AuthorizeOAuthUser", "api.user.authorize_oauth_user.bad_token.app_error", nil, "token_type=" + ar.TokenType + ", response_body=" + string(respBody))
 	}
 
 	if len(ar.AccessToken) == 0 {
@@ -800,7 +802,7 @@ func AuthorizeOAuthUser(service, code, state, redirectUri string) (io.ReadCloser
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", "Bearer "+ar.AccessToken)
+	req.Header.Set("Authorization", "Bearer " + ar.AccessToken)
 
 	if resp, err := client.Do(req); err != nil {
 		return nil, "", nil, model.NewLocAppError("AuthorizeOAuthUser", "api.user.authorize_oauth_user.service.app_error",
@@ -857,7 +859,7 @@ func CompleteSwitchWithOAuth(c *Context, w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	go sendSignInChangeEmail(c, user.Email, c.GetSiteURL(), strings.Title(service)+" SSO")
+	go sendSignInChangeEmail(c, user.Email, c.GetSiteURL(), strings.Title(service) + " SSO")
 }
 
 func deleteOAuthApp(c *Context, w http.ResponseWriter, r *http.Request) {
@@ -889,7 +891,7 @@ func deleteOAuthApp(c *Context, w http.ResponseWriter, r *http.Request) {
 	} else {
 		if c.Session.UserId != result.Data.(*model.OAuthApp).CreatorId && !HasPermissionToContext(c, model.PERMISSION_MANAGE_SYSTEM_WIDE_OAUTH) {
 			c.LogAudit("fail - inappropriate permissions")
-			c.Err = model.NewLocAppError("deleteOAuthApp", "api.oauth.delete.permissions.app_error", nil, "user_id="+c.Session.UserId)
+			c.Err = model.NewLocAppError("deleteOAuthApp", "api.oauth.delete.permissions.app_error", nil, "user_id=" + c.Session.UserId)
 			return
 		}
 	}
