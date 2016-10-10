@@ -27,9 +27,8 @@ type AccessResponse struct {
 	AccessToken  string `json:"access_token"`
 	TokenType    string `json:"token_type"`
 	ExpiresIn    int32  `json:"expires_in"`
-	Scope        string `json:"scope"`
 	RefreshToken string `json:"refresh_token"`
-	IdToken string `json:"id_token"`
+	IdToken	     string `json:"id_token"`
 }
 
 // IsValid validates the AccessData and returns an error if it isn't configured

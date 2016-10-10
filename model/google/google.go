@@ -8,7 +8,6 @@ import (
 	"github.com/mattermost/platform/einterfaces"
 	"github.com/mattermost/platform/model"
 	"io"
-	"strconv"
 	"strings"
 	"fmt"
 )
@@ -20,13 +19,28 @@ func getOauthType() string {
 type GoogleProvider struct {
 }
 
+//type GoogleUser struct {
+//	Id         string `json:"sub"`
+//	Email      string `json:"email"`
+//	Name       string `json:"name"`
+//	GivenName  string `json:"given_name"`
+//	FamilyName string `json:"family_name"`
+//}
+
 type GoogleUser struct {
-	Id         int64  `json:"sub"`
-	Username   string `json:"sub"`
-	Email      string `json:"email"`
-	Name       string `json:"name"`
-	GivenName  string `json:"given_name"`
-	FamilyName string `json:"family_name"`
+	Id          string              `json:"id"`
+	DisplayName string              `json:"displayName"`
+	Emails      []map[string]string `json:"emails"`
+	Names       map[string]string   `json:"name"`
+
+	Username    string
+	FamilyName  string
+	GivenName   string
+	Email       string
+}
+
+func (ggu *GoogleUser) ToString() string {
+	return fmt.Sprintf("Id: %s, Email: %s, Name: %s, GivenName: %s, FamilyName: %s", ggu.Id, ggu.Email, ggu.DisplayName, ggu.GivenName, ggu.FamilyName)
 }
 
 func init() {
@@ -34,29 +48,44 @@ func init() {
 	einterfaces.RegisterOauthProvider(getOauthType(), provider)
 }
 
-func userFromGoogleUser(ggu *GoogleUser) *model.User {
-	user := &model.User{}
-	user.Username = model.CleanUsername(ggu.Username)
+func (ggu *GoogleUser) ParseInfo() {
+	ggu.FamilyName = ggu.Names["familyName"]
+	ggu.GivenName = ggu.Names["givenName"]
 
 	if len(ggu.FamilyName) == 0 && len(ggu.GivenName) == 0 {
-		splitName := strings.Split(ggu.Name, " ")
+		splitName := strings.Split(ggu.DisplayName, " ")
 		if len(splitName) == 2 {
-			user.FirstName = splitName[0]
-			user.LastName = splitName[1]
+			ggu.GivenName = splitName[0]
+			ggu.FamilyName = splitName[1]
 		} else if len(splitName) >= 2 {
-			user.FirstName = splitName[0]
-			user.LastName = strings.Join(splitName[1:], " ")
+			ggu.GivenName = splitName[0]
+			ggu.FamilyName = strings.Join(splitName[1:], " ")
 		} else {
-			user.FirstName = ggu.Name
+			ggu.GivenName = ggu.DisplayName
 		}
-	} else {
-		user.FirstName = ggu.GivenName
-		user.LastName = ggu.FamilyName
 	}
 
+	for _, e := range ggu.Emails {
+		if e["type"] == "account" {
+			ggu.Email = e["value"]
+			ggu.Username = strings.Split(ggu.Email, "@")[0]
+			break
+		}
+	}
+}
+
+func userFromGoogleUser(ggu *GoogleUser) *model.User {
+	user := &model.User{}
+
+	user.FirstName = ggu.GivenName
+	user.LastName = ggu.FamilyName
+
+	user.Username = model.CleanUsername(ggu.Username)
 	user.Email = strings.TrimSpace(ggu.Email)
-	userId := strconv.FormatInt(ggu.Id, 10)
+
+	userId := strings.TrimSpace(ggu.Id)
 	user.AuthData = &userId
+
 	user.AuthService = getOauthType()
 
 	return user
@@ -66,8 +95,8 @@ func googleUserFromJson(data io.Reader) *GoogleUser {
 	decoder := json.NewDecoder(data)
 	var ggu GoogleUser
 	err := decoder.Decode(&ggu)
-	fmt.Println("email: " + ggu.Email)
 	if err == nil {
+		ggu.ParseInfo()
 		return &ggu
 	} else {
 		return nil
@@ -75,7 +104,7 @@ func googleUserFromJson(data io.Reader) *GoogleUser {
 }
 
 func (ggu *GoogleUser) IsValid() bool {
-	if ggu.Id == 0 {
+	if len(ggu.Id) == 0 {
 		return false
 	}
 
@@ -87,7 +116,7 @@ func (ggu *GoogleUser) IsValid() bool {
 }
 
 func (ggu *GoogleUser) getAuthData() string {
-	return strconv.FormatInt(ggu.Id, 10)
+	return strings.TrimSpace(ggu.Id)
 }
 
 func (m *GoogleProvider) GetIdentifier() string {

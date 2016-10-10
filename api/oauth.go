@@ -796,9 +796,14 @@ func AuthorizeOAuthUser(service, code, state, redirectUri string) (io.ReadCloser
 		return nil, "", nil, model.NewLocAppError("AuthorizeOAuthUser", "api.user.authorize_oauth_user.missing.app_error", nil, "")
 	}
 
-	p = url.Values{}
-	p.Set("access_token", ar.AccessToken)
-	req, _ = http.NewRequest("GET", sso.UserApiEndpoint, strings.NewReader(""))
+	//p = url.Values{}
+	//p.Set("access_token", ar.AccessToken)
+	//req, _ = http.NewRequest("GET", sso.UserApiEndpoint, strings.NewReader(p.Encode()))
+
+	req, _ = http.NewRequest("GET", sso.UserApiEndpoint, nil)
+	query := req.URL.Query()
+	query.Add("access_token", ar.AccessToken)
+	req.URL.RawQuery = query.Encode()
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "application/json")

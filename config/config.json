@@ -153,15 +153,25 @@
         "TokenEndpoint": "http://gitlab.rever.vn/oauth/token",
         "UserApiEndpoint": "http://gitlab.rever.vn/api/v3/user"
     },
+    "FacebookSettings": {
+        "Enable": true,
+        "Secret": "3556f1ffcde043574f70427d97808763",
+        "Id": "267105493690160",
+        "ResponseType": "code",
+        "Scope": "profile email",
+        "AuthEndpoint": "https://www.facebook.com/dialog/oauth",
+        "TokenEndpoint": "https://graph.facebook.com/oauth/access_token",
+        "UserApiEndpoint": "https://graph.facebook.com/me"
+    },
     "GoogleSettings": {
         "Enable": true,
         "Secret": "5axpO0CIQlUpQZbt2-6nA3X_",
         "Id": "307733077824-ar5oa2r2pklicahed8veljd3qmsje98e.apps.googleusercontent.com",
         "ResponseType": "code",
-        "Scope": "profile email openid",
+        "Scope": "profile email",
         "AuthEndpoint": "https://accounts.google.com/o/oauth2/v2/auth",
         "TokenEndpoint": "https://www.googleapis.com/oauth2/v4/token",
-        "UserApiEndpoint": "https://www.googleapis.com/oauth2/v3/tokeninfo"
+        "UserApiEndpoint": "https://www.googleapis.com/plus/v1/people/me"
     },
     "Office365Settings": {
         "Enable": false,

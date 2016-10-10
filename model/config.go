@@ -348,20 +348,25 @@ func (o *Config) ToJson() string {
 func (o *Config) GetSSOService(service string) *SSOSettings {
 	switch service {
 	case SERVICE_GITLAB:
-		return SetDefaultSSPSettings(&o.GitLabSettings)
+		setting := o.GitLabSettings
+		setting.SetDefaultSettings()
+		return &setting
 	case SERVICE_GOOGLE:
-		return SetDefaultSSPSettings(&o.GoogleSettings)
+		setting := o.GoogleSettings
+		setting.SetDefaultSettings()
+		return &setting
 	case SERVICE_OFFICE365:
-		return SetDefaultSSPSettings(&o.Office365Settings)
+		setting := o.Office365Settings
+		setting.SetDefaultSettings()
+		return &setting
 	}
 	return nil
 }
 
-func SetDefaultSSPSettings(ssoSettings *SSOSettings) *SSOSettings {
-	if len(ssoSettings.ResponseType) == 0 {
-		ssoSettings.ResponseType = "code"
+func (ssoSetting *SSOSettings) SetDefaultSettings() {
+	if len(ssoSetting.ResponseType) == 0 {
+		ssoSetting.ResponseType = "code"
 	}
-	return ssoSettings
 }
 
 func ConfigFromJson(data io.Reader) *Config {
