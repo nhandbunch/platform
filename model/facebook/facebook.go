@@ -1,7 +1,6 @@
 package oauthfacebook
 
 import (
-	"strconv"
 	"github.com/mattermost/platform/model"
 	"io"
 	"github.com/mattermost/platform/einterfaces"
@@ -13,11 +12,11 @@ type FacebookProvider struct {
 }
 
 type FacebookUser struct {
-	Id       int64  `json:"id"`
-	Username string `json:"username"`
-	Login    string `json:"login"`
+	Id       string  `json:"id"`
 	Email    string `json:"email"`
 	Name     string `json:"name"`
+
+	Username string
 }
 
 func getOauthType() string {
@@ -31,11 +30,10 @@ func init() {
 
 func userFromFacebookUser(fbu *FacebookUser) *model.User {
 	user := &model.User{}
-	username := fbu.Username
-	if username == "" {
-		username = fbu.Login
-	}
+
+	username := strings.Split(fbu.Email, "@")[0]
 	user.Username = model.CleanUsername(username)
+
 	splitName := strings.Split(fbu.Name, " ")
 	if len(splitName) == 2 {
 		user.FirstName = splitName[0]
@@ -46,9 +44,8 @@ func userFromFacebookUser(fbu *FacebookUser) *model.User {
 	} else {
 		user.FirstName = fbu.Name
 	}
-	strings.TrimSpace(user.Email)
-	user.Email = fbu.Email
-	userId := strconv.FormatInt(fbu.Id, 10)
+	user.Email = strings.TrimSpace(fbu.Email)
+	userId := strings.TrimSpace(fbu.Id)
 	user.AuthData = &userId
 	user.AuthService = getOauthType()
 
@@ -67,7 +64,7 @@ func facebookUserFromJson(data io.Reader) *FacebookUser {
 }
 
 func (fbu *FacebookUser) IsValid() bool {
-	if fbu.Id == 0 {
+	if len(fbu.Id) == 0 {
 		return false
 	}
 
@@ -79,7 +76,7 @@ func (fbu *FacebookUser) IsValid() bool {
 }
 
 func (fbu *FacebookUser) getAuthData() string {
-	return strconv.FormatInt(fbu.Id, 10)
+	return strings.TrimSpace(fbu.Id)
 }
 
 func (m *FacebookProvider) GetIdentifier() string {

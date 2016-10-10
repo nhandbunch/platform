@@ -16,7 +16,7 @@
         "EnableOAuthServiceProvider": false,
         "EnableIncomingWebhooks": true,
         "EnableOutgoingWebhooks": true,
-        "EnableCommands": true,
+        "EnableCommands": false,
         "EnableOnlyAdminIntegrations": true,
         "EnablePostUsernameOverride": false,
         "EnablePostIconOverride": false,
@@ -38,8 +38,8 @@
     },
     "TeamSettings": {
         "SiteName": "Mattermost",
-        "MaxUsersPerTeam": 50,
-        "EnableTeamCreation": true,
+        "MaxUsersPerTeam": 1000000,
+        "EnableTeamCreation": false,
         "EnableUserCreation": true,
         "EnableOpenServer": false,
         "RestrictCreationToDomains": "",
@@ -47,7 +47,7 @@
         "EnableCustomBrand": false,
         "CustomBrandText": "",
         "CustomDescriptionText": "",
-        "RestrictDirectMessage": "any",
+        "RestrictDirectMessage": "team",
         "RestrictTeamInvite": "all",
         "RestrictPublicChannelManagement": "all",
         "RestrictPrivateChannelManagement": "all",
@@ -158,10 +158,10 @@
         "Secret": "3556f1ffcde043574f70427d97808763",
         "Id": "267105493690160",
         "ResponseType": "code",
-        "Scope": "profile email",
+        "Scope": "public_profile email",
         "AuthEndpoint": "https://www.facebook.com/dialog/oauth",
         "TokenEndpoint": "https://graph.facebook.com/oauth/access_token",
-        "UserApiEndpoint": "https://graph.facebook.com/me"
+        "UserApiEndpoint": "https://graph.facebook.com/me?fields=id,name,email"
     },
     "GoogleSettings": {
         "Enable": true,

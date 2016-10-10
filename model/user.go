@@ -15,11 +15,11 @@ import (
 )
 
 const (
-	USER_NOTIFY_ALL            = "all"
-	USER_NOTIFY_MENTION        = "mention"
-	USER_NOTIFY_NONE           = "none"
-	DEFAULT_LOCALE             = "en"
-	USER_AUTH_SERVICE_EMAIL    = "email"
+	USER_NOTIFY_ALL = "all"
+	USER_NOTIFY_MENTION = "mention"
+	USER_NOTIFY_NONE = "none"
+	DEFAULT_LOCALE = "en"
+	USER_AUTH_SERVICE_EMAIL = "email"
 	USER_AUTH_SERVICE_USERNAME = "username"
 )
 
@@ -59,43 +59,43 @@ func (u *User) IsValid() *AppError {
 	}
 
 	if u.CreateAt == 0 {
-		return NewLocAppError("User.IsValid", "model.user.is_valid.create_at.app_error", nil, "user_id="+u.Id)
+		return NewLocAppError("User.IsValid", "model.user.is_valid.create_at.app_error", nil, "user_id=" + u.Id)
 	}
 
 	if u.UpdateAt == 0 {
-		return NewLocAppError("User.IsValid", "model.user.is_valid.update_at.app_error", nil, "user_id="+u.Id)
+		return NewLocAppError("User.IsValid", "model.user.is_valid.update_at.app_error", nil, "user_id=" + u.Id)
 	}
 
 	if !IsValidUsername(u.Username) {
-		return NewLocAppError("User.IsValid", "model.user.is_valid.username.app_error", nil, "user_id="+u.Id)
+		return NewLocAppError("User.IsValid", "model.user.is_valid.username.app_error", nil, "user_id=" + u.Id)
 	}
 
 	if len(u.Email) > 128 || len(u.Email) == 0 {
-		return NewLocAppError("User.IsValid", "model.user.is_valid.email.app_error", nil, "user_id="+u.Id)
+		return NewLocAppError("User.IsValid", "model.user.is_valid.email.app_error", nil, "user_id=" + u.Id)
 	}
 
 	if utf8.RuneCountInString(u.Nickname) > 64 {
-		return NewLocAppError("User.IsValid", "model.user.is_valid.nickname.app_error", nil, "user_id="+u.Id)
+		return NewLocAppError("User.IsValid", "model.user.is_valid.nickname.app_error", nil, "user_id=" + u.Id)
 	}
 
 	if utf8.RuneCountInString(u.FirstName) > 64 {
-		return NewLocAppError("User.IsValid", "model.user.is_valid.first_name.app_error", nil, "user_id="+u.Id)
+		return NewLocAppError("User.IsValid", "model.user.is_valid.first_name.app_error", nil, "user_id=" + u.Id)
 	}
 
 	if utf8.RuneCountInString(u.LastName) > 64 {
-		return NewLocAppError("User.IsValid", "model.user.is_valid.last_name.app_error", nil, "user_id="+u.Id)
+		return NewLocAppError("User.IsValid", "model.user.is_valid.last_name.app_error", nil, "user_id=" + u.Id)
 	}
 
 	if u.AuthData != nil && len(*u.AuthData) > 128 {
-		return NewLocAppError("User.IsValid", "model.user.is_valid.auth_data.app_error", nil, "user_id="+u.Id)
+		return NewLocAppError("User.IsValid", "model.user.is_valid.auth_data.app_error", nil, "user_id=" + u.Id)
 	}
 
 	if u.AuthData != nil && len(*u.AuthData) > 0 && len(u.AuthService) == 0 {
-		return NewLocAppError("User.IsValid", "model.user.is_valid.auth_data_type.app_error", nil, "user_id="+u.Id)
+		return NewLocAppError("User.IsValid", "model.user.is_valid.auth_data_type.app_error", nil, "user_id=" + u.Id)
 	}
 
 	if len(u.Password) > 0 && u.AuthData != nil && len(*u.AuthData) > 0 {
-		return NewLocAppError("User.IsValid", "model.user.is_valid.auth_data_pwd.app_error", nil, "user_id="+u.Id)
+		return NewLocAppError("User.IsValid", "model.user.is_valid.auth_data_pwd.app_error", nil, "user_id=" + u.Id)
 	}
 
 	return nil
@@ -189,7 +189,7 @@ func (user *User) UpdateMentionKeysFromUsername(oldUsername string) {
 	nonUsernameKeys := []string{}
 	splitKeys := strings.Split(user.NotifyProps["mention_keys"], ",")
 	for _, key := range splitKeys {
-		if key != oldUsername && key != "@"+oldUsername {
+		if key != oldUsername && key != "@" + oldUsername {
 			nonUsernameKeys = append(nonUsernameKeys, key)
 		}
 	}
@@ -368,7 +368,9 @@ func IsInRole(userRoles string, inRole string) bool {
 }
 
 func (u *User) IsOAuthUser() bool {
-	if u.AuthService == USER_AUTH_SERVICE_GITLAB {
+	if u.AuthService == USER_AUTH_SERVICE_GITLAB ||
+		u.AuthService == USER_AUTH_SERVICE_GOOGLE ||
+		u.AuthService == USER_AUTH_SERVICE_FACEBOOK {
 		return true
 	}
 	return false

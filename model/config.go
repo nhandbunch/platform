@@ -27,6 +27,7 @@ const (
 	SERVICE_GITLAB = "gitlab"
 	SERVICE_GOOGLE = "google"
 	SERVICE_OFFICE365 = "office365"
+	SERVICE_FACEBOOK = "facebook"
 
 	WEBSERVER_MODE_REGULAR = "regular"
 	WEBSERVER_MODE_GZIP = "gzip"
@@ -327,6 +328,7 @@ type Config struct {
 	GitLabSettings       SSOSettings
 	GoogleSettings       SSOSettings
 	Office365Settings    SSOSettings
+	FacebookSettings     SSOSettings
 	LdapSettings         LdapSettings
 	ComplianceSettings   ComplianceSettings
 	LocalizationSettings LocalizationSettings
@@ -357,6 +359,10 @@ func (o *Config) GetSSOService(service string) *SSOSettings {
 		return &setting
 	case SERVICE_OFFICE365:
 		setting := o.Office365Settings
+		setting.SetDefaultSettings()
+		return &setting
+	case SERVICE_FACEBOOK:
+		setting := o.FacebookSettings
 		setting.SetDefaultSettings()
 		return &setting
 	}

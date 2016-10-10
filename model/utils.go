@@ -18,13 +18,14 @@ import (
 
 	goi18n "github.com/nicksnyder/go-i18n/i18n"
 	"github.com/pborman/uuid"
+	"io/ioutil"
 )
 
 const (
 	LOWERCASE_LETTERS = "abcdefghijklmnopqrstuvwxyz"
 	UPPERCASE_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	NUMBERS           = "0123456789"
-	SYMBOLS           = " !\"\\#$%&'()*+,-./:;<=>?@[]^_`|~"
+	NUMBERS = "0123456789"
+	SYMBOLS = " !\"\\#$%&'()*+,-./:;<=>?@[]^_`|~"
 )
 
 type StringInterface map[string]interface{}
@@ -112,7 +113,7 @@ func NewId() string {
 
 func NewRandomString(length int) string {
 	var b bytes.Buffer
-	str := make([]byte, length+8)
+	str := make([]byte, length + 8)
 	rand.Read(str)
 	encoder := base32.NewEncoder(encoding, &b)
 	encoder.Write(str)
@@ -449,4 +450,25 @@ func IsValidWebsocketUrl(rawUrl string) bool {
 	}
 
 	return true
+}
+
+func ByteFromBody(data io.Reader) []byte {
+	s, err := ioutil.ReadAll(data)
+	if (err != nil) {
+		return []byte{}
+	} else {
+		return s
+	}
+}
+
+func ParseParam(str string) map[string]string {
+	params := map[string]string{}
+	split := strings.Split(str, "&")
+	for _, e := range split {
+		split1 := strings.Split(e, "=")
+		if len(split1) == 2 {
+			params[split1[0]] = split1[1]
+		}
+	}
+	return params
 }

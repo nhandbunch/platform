@@ -15,6 +15,10 @@ const (
 	OAUTH_ACTION_LOGIN        = "login"
 	OAUTH_ACTION_EMAIL_TO_SSO = "email_to_sso"
 	OAUTH_ACTION_SSO_TO_EMAIL = "sso_to_email"
+
+	USER_AUTH_SERVICE_GITLAB = "gitlab"
+	USER_AUTH_SERVICE_GOOGLE = "google"
+	USER_AUTH_SERVICE_FACEBOOK = "facebook"
 )
 
 type OAuthApp struct {
