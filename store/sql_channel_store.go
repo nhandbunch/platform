@@ -9,7 +9,6 @@ import (
 	"github.com/go-gorp/gorp"
 	"github.com/mattermost/platform/model"
 	"github.com/mattermost/platform/utils"
-	"fmt"
 )
 
 const (

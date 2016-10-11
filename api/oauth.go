@@ -786,7 +786,7 @@ func AuthorizeOAuthUser(service, code, state, redirectUri string) (io.ReadCloser
 		}
 		if len(ar.AccessToken) == 0 {
 			urlParse := model.ParseParam(string(bytesResult))
-			fmt.Println(urlParse)
+			//fmt.Println(urlParse)
 			ar.AccessToken = urlParse["access_token"]
 		}
 		defer func() {

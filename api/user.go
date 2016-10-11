@@ -108,7 +108,8 @@ func createUser(c *Context, w http.ResponseWriter, r *http.Request) {
 		}
 
 		t, err := strconv.ParseInt(props["time"], 10, 64)
-		if err != nil || model.GetMillis()-t > 1000*60*60*48 { // 48 hours
+		if err != nil || model.GetMillis() - t > 1000 * 60 * 60 * 48 {
+			// 48 hours
 			c.Err = model.NewLocAppError("createUser", "api.user.create_user.signup_link_expired.app_error", nil, "")
 			return
 		}
@@ -153,7 +154,7 @@ func createUser(c *Context, w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !firstAccount && !*utils.Cfg.TeamSettings.EnableOpenServer && len(teamId) == 0 {
-		c.Err = model.NewLocAppError("createUser", "api.user.create_user.no_open_server", nil, "email="+user.Email)
+		c.Err = model.NewLocAppError("createUser", "api.user.create_user.no_open_server", nil, "email=" + user.Email)
 		return
 	}
 
@@ -195,7 +196,7 @@ func CheckUserDomain(user *model.User, domains string) bool {
 
 	matched := false
 	for _, d := range domainArray {
-		if strings.HasSuffix(strings.ToLower(user.Email), "@"+d) {
+		if strings.HasSuffix(strings.ToLower(user.Email), "@" + d) {
 			matched = true
 			break
 		}
@@ -305,7 +306,7 @@ func CreateOAuthUser(c *Context, w http.ResponseWriter, r *http.Request, service
 
 	if result := <-suchan; result.Err == nil {
 		c.Err = model.NewLocAppError("CreateOAuthUser", "api.user.create_oauth_user.already_used.app_error",
-			map[string]interface{}{"Service": service}, "email="+user.Email)
+			map[string]interface{}{"Service": service}, "email=" + user.Email)
 		return nil
 	}
 
@@ -313,10 +314,10 @@ func CreateOAuthUser(c *Context, w http.ResponseWriter, r *http.Request, service
 		authService := result.Data.(*model.User).AuthService
 		if authService == "" {
 			c.Err = model.NewLocAppError("CreateOAuthUser", "api.user.create_oauth_user.already_attached.app_error",
-				map[string]interface{}{"Service": service, "Auth": model.USER_AUTH_SERVICE_EMAIL}, "email="+user.Email)
+				map[string]interface{}{"Service": service, "Auth": model.USER_AUTH_SERVICE_EMAIL}, "email=" + user.Email)
 		} else {
 			c.Err = model.NewLocAppError("CreateOAuthUser", "api.user.create_oauth_user.already_attached.app_error",
-				map[string]interface{}{"Service": service, "Auth": authService}, "email="+user.Email)
+				map[string]interface{}{"Service": service, "Auth": authService}, "email=" + user.Email)
 		}
 		return nil
 	}
@@ -638,7 +639,7 @@ func doLogin(c *Context, w http.ResponseWriter, r *http.Request, user *model.Use
 		secure = true
 	}
 
-	expiresAt := time.Unix(model.GetMillis()/1000+int64(maxAge), 0)
+	expiresAt := time.Unix(model.GetMillis() / 1000 + int64(maxAge), 0)
 	sessionCookie := &http.Cookie{
 		Name:     model.SESSION_COOKIE_TOKEN,
 		Value:    session.Token,
@@ -670,7 +671,7 @@ func attachDeviceId(c *Context, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !(strings.HasPrefix(deviceId, model.PUSH_NOTIFY_APPLE+":") || strings.HasPrefix(deviceId, model.PUSH_NOTIFY_ANDROID+":")) {
+	if !(strings.HasPrefix(deviceId, model.PUSH_NOTIFY_APPLE + ":") || strings.HasPrefix(deviceId, model.PUSH_NOTIFY_ANDROID + ":")) {
 		c.SetInvalidParam("attachDevice", "deviceId")
 		return
 	}
@@ -704,7 +705,7 @@ func attachDeviceId(c *Context, w http.ResponseWriter, r *http.Request) {
 		secure = true
 	}
 
-	expiresAt := time.Unix(model.GetMillis()/1000+int64(maxAge), 0)
+	expiresAt := time.Unix(model.GetMillis() / 1000 + int64(maxAge), 0)
 	sessionCookie := &http.Cookie{
 		Name:     model.SESSION_COOKIE_TOKEN,
 		Value:    c.Session.Token,
@@ -757,7 +758,7 @@ func RevokeAllSession(c *Context, userId string) {
 		sessions := result.Data.([]*model.Session)
 
 		for _, session := range sessions {
-			c.LogAuditWithUserId(userId, "session_id="+session.Id)
+			c.LogAuditWithUserId(userId, "session_id=" + session.Id)
 			if session.IsOAuth {
 				RevokeAccessToken(session.Token)
 			} else {
@@ -1129,7 +1130,7 @@ func createProfileImage(username string, userId string) ([]byte, *model.AppError
 
 	width := int(utils.Cfg.FileSettings.ProfileWidth)
 	height := int(utils.Cfg.FileSettings.ProfileHeight)
-	color := colors[int64(seed)%int64(len(colors))]
+	color := colors[int64(seed) % int64(len(colors))]
 	dstImg := image.NewRGBA(image.Rect(0, 0, width, height))
 	srcImg := image.White
 	draw.Draw(dstImg, dstImg.Bounds(), &image.Uniform{color}, image.ZP, draw.Src)
@@ -1142,7 +1143,7 @@ func createProfileImage(username string, userId string) ([]byte, *model.AppError
 	c.SetDst(dstImg)
 	c.SetSrc(srcImg)
 
-	pt := freetype.Pt(width/6, height*2/3)
+	pt := freetype.Pt(width / 6, height * 2 / 3)
 	_, err = c.DrawString(initial, pt)
 	if err != nil {
 		return nil, model.NewLocAppError("createProfileImage", "api.user.create_profile_image.initial.app_error", nil, err.Error())
@@ -1251,7 +1252,7 @@ func uploadProfileImage(c *Context, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		c.Err = model.NewLocAppError("uploadProfileFile", "api.user.upload_profile_user.decode_config.app_error", nil, err.Error())
 		return
-	} else if config.Width*config.Height > MaxImageSize {
+	} else if config.Width * config.Height > MaxImageSize {
 		c.Err = model.NewLocAppError("uploadProfileFile", "api.user.upload_profile_user.too_large.app_error", nil, err.Error())
 		return
 	}
@@ -1402,7 +1403,7 @@ func updatePassword(c *Context, w http.ResponseWriter, r *http.Request) {
 
 	if user.AuthData != nil && *user.AuthData != "" {
 		c.LogAudit("failed - tried to update user password who was logged in through oauth")
-		c.Err = model.NewLocAppError("updatePassword", "api.user.update_password.oauth.app_error", nil, "auth_service="+user.AuthService)
+		c.Err = model.NewLocAppError("updatePassword", "api.user.update_password.oauth.app_error", nil, "auth_service=" + user.AuthService)
 		c.Err.StatusCode = http.StatusBadRequest
 		return
 	}
@@ -1480,7 +1481,7 @@ func UpdateUserRoles(c *Context, user *model.User, newRoles string) *model.User 
 		c.Err = result.Err
 		return nil
 	} else {
-		c.LogAuditWithUserId(user.Id, "roles="+newRoles)
+		c.LogAuditWithUserId(user.Id, "roles=" + newRoles)
 		ruser = result.Data.([2]*model.User)[0]
 	}
 
@@ -1517,13 +1518,13 @@ func updateActive(c *Context, w http.ResponseWriter, r *http.Request) {
 	isSelfDeactive := !active && user_id == c.Session.UserId
 
 	if !isSelfDeactive && !HasPermissionToContext(c, model.PERMISSION_MANAGE_SYSTEM) {
-		c.Err = model.NewLocAppError("updateActive", "api.user.update_active.permissions.app_error", nil, "userId="+user_id)
+		c.Err = model.NewLocAppError("updateActive", "api.user.update_active.permissions.app_error", nil, "userId=" + user_id)
 		c.Err.StatusCode = http.StatusForbidden
 		return
 	}
 
 	if user.IsLDAPUser() {
-		c.Err = model.NewLocAppError("updateActive", "api.user.update_active.no_deactivate_ldap.app_error", nil, "userId="+user_id)
+		c.Err = model.NewLocAppError("updateActive", "api.user.update_active.no_deactivate_ldap.app_error", nil, "userId=" + user_id)
 		c.Err.StatusCode = http.StatusBadRequest
 		return
 	}
@@ -1653,14 +1654,14 @@ func sendPasswordReset(c *Context, w http.ResponseWriter, r *http.Request) {
 
 	var user *model.User
 	if result := <-Srv.Store.User().GetByEmail(email); result.Err != nil {
-		c.Err = model.NewLocAppError("sendPasswordReset", "api.user.send_password_reset.find.app_error", nil, "email="+email)
+		c.Err = model.NewLocAppError("sendPasswordReset", "api.user.send_password_reset.find.app_error", nil, "email=" + email)
 		return
 	} else {
 		user = result.Data.(*model.User)
 	}
 
 	if user.AuthData != nil && len(*user.AuthData) != 0 {
-		c.Err = model.NewLocAppError("sendPasswordReset", "api.user.send_password_reset.sso.app_error", nil, "userId="+user.Id)
+		c.Err = model.NewLocAppError("sendPasswordReset", "api.user.send_password_reset.sso.app_error", nil, "userId=" + user.Id)
 		return
 	}
 
@@ -1685,11 +1686,11 @@ func sendPasswordReset(c *Context, w http.ResponseWriter, r *http.Request) {
 	bodyPage.Props["Button"] = c.T("api.templates.reset_body.button")
 
 	if err := utils.SendMail(email, subjectPage.Render(), bodyPage.Render()); err != nil {
-		c.Err = model.NewLocAppError("sendPasswordReset", "api.user.send_password_reset.send.app_error", nil, "err="+err.Message)
+		c.Err = model.NewLocAppError("sendPasswordReset", "api.user.send_password_reset.send.app_error", nil, "err=" + err.Message)
 		return
 	}
 
-	c.LogAuditWithUserId(user.Id, "sent="+email)
+	c.LogAuditWithUserId(user.Id, "sent=" + email)
 
 	w.Write([]byte(model.MapToJson(props)))
 }
@@ -1720,7 +1721,7 @@ func resetPassword(c *Context, w http.ResponseWriter, r *http.Request) {
 	} else {
 		recovery := result.Data.(*model.PasswordRecovery)
 
-		if model.GetMillis()-recovery.CreateAt < model.PASSWORD_RECOVER_EXPIRY_TIME {
+		if model.GetMillis() - recovery.CreateAt < model.PASSWORD_RECOVER_EXPIRY_TIME {
 			userId = recovery.UserId
 		} else {
 			c.LogAuditWithUserId(userId, "fail - link expired")
@@ -1756,7 +1757,7 @@ func ResetPassword(c *Context, userId, newPassword string) *model.AppError {
 	}
 
 	if user.AuthData != nil && len(*user.AuthData) != 0 && !HasPermissionToContext(c, model.PERMISSION_MANAGE_SYSTEM) {
-		return model.NewLocAppError("ResetPassword", "api.user.reset_password.sso.app_error", nil, "userId="+user.Id)
+		return model.NewLocAppError("ResetPassword", "api.user.reset_password.sso.app_error", nil, "userId=" + user.Id)
 
 	}
 
@@ -2473,7 +2474,7 @@ func completeSaml(c *Context, w http.ResponseWriter, r *http.Request) {
 			break
 		case model.OAUTH_ACTION_EMAIL_TO_SSO:
 			RevokeAllSession(c, user.Id)
-			go sendSignInChangeEmail(c, user.Email, c.GetSiteURL(), strings.Title(model.USER_AUTH_SERVICE_SAML)+" SSO")
+			go sendSignInChangeEmail(c, user.Email, c.GetSiteURL(), strings.Title(model.USER_AUTH_SERVICE_SAML) + " SSO")
 			break
 		}
 		doLogin(c, w, r, user, "")
@@ -2482,10 +2483,10 @@ func completeSaml(c *Context, w http.ResponseWriter, r *http.Request) {
 		}
 
 		if val, ok := relayProps["redirect_to"]; ok {
-			http.Redirect(w, r, c.GetSiteURL()+val, http.StatusFound)
+			http.Redirect(w, r, c.GetSiteURL() + val, http.StatusFound)
 			return
 		}
-		http.Redirect(w, r, GetProtocol(r)+"://"+r.Host, http.StatusFound)
+		http.Redirect(w, r, GetProtocol(r) + "://" + r.Host, http.StatusFound)
 	}
 }
 

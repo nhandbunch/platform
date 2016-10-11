@@ -33,7 +33,7 @@
         "WebsocketSecurePort": 443,
         "WebsocketPort": 80,
         "WebserverMode": "gzip",
-        "EnableCustomEmoji": false,
+        "EnableCustomEmoji": true,
         "RestrictCustomEmojiCreation": "all"
     },
     "TeamSettings": {
