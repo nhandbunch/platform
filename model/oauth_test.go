@@ -6,7 +6,30 @@ package model
 import (
 	"strings"
 	"testing"
+	"fmt"
+	"github.com/pborman/uuid"
+	"bytes"
+	"encoding/base32"
 )
+
+func TestUUID(t *testing.T) {
+	s := uuid.NewRandom().String()
+	fmt.Println(s)
+
+	var b bytes.Buffer
+	encoder := base32.NewEncoder(encoding, &b)
+	encoder.Write(s)
+	encoder.Close()
+	b.Truncate(26) // removes the '==' padding
+	fmt.Println(b.String())
+
+	var b1 bytes.Buffer
+	encoder1 := base32.NewEncoder(encoding, &b1)
+	encoder1.Write(s)
+	encoder1.Close()
+	//b.Truncate(26) // removes the '==' padding
+	fmt.Println(b1.String())
+}
 
 func TestOAuthAppJson(t *testing.T) {
 	a1 := OAuthApp{}

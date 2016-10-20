@@ -25,7 +25,7 @@
         "EnableSecurityFixAlert": true,
         "EnableInsecureOutgoingConnections": false,
         "EnableMultifactorAuthentication": false,
-        "AllowCorsFrom": "",
+        "AllowCorsFrom": "http://chat.demomattermost.com,http://localhost:63342",
         "SessionLengthWebInDays": 30,
         "SessionLengthMobileInDays": 30,
         "SessionLengthSSOInDays": 30,
